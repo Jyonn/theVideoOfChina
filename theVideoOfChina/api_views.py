@@ -1,0 +1,23 @@
+from Base.decorator import require_get
+from Base.error import Error
+from Base.response import response, error_response
+
+from VideoHandler.xinpianchang import XinPianChang
+
+websites = [
+    XinPianChang,
+]
+
+
+@require_get(['url'])
+def get_dl_link(request):
+    url = request.d.url
+
+    for web in websites:
+        if web.detect(url):
+            ret = web.handler(url)
+            if ret.error is not Error.OK:
+                return error_response(ret)
+            return response(body=ret.body)
+
+    return error_response(Error.UNRESOLVED_LINK)
