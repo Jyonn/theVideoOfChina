@@ -18,9 +18,9 @@ class ErGeng:
         media_id_regex = '"media_id": (.*?),'
         media_id = re.search(media_id_regex, html, flags=re.S).group(1)
 
-        title_regex = '"title": (.*?),'
+        title_regex = '"title": "(.*?)",'
         title = re.search(title_regex, html, flags=re.S).group(1)
-        cover_regex = '"cover": (.*?),'
+        cover_regex = '"cover": "(.*?)",'
         cover = re.search(cover_regex, html, flags=re.S).group(1)
 
         data = abstract_grab(cls.RESOURCE_API % media_id)
