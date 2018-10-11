@@ -1,0 +1,33 @@
+{
+    "status": 0,
+    "msg": {
+        "site": "二更影视平台",
+        "time_length": "",
+        "total_size": "",
+        "title": "",
+        "logo": "",
+        "segs": {
+            "SD": [
+                {
+                    "url": "http://v1.ergengtech.com/transcode/d205fe25d74d26160f4a22a29dcefdf3/19c59dbb6168e717db77f1dd6e191e3e.mp4",
+                    "seconds": "312",
+                    "number": "0"
+                }
+            ],
+            "720p": [
+                {
+                    "url": "http://v1.ergengtech.com/transcode/d205fe25d74d26160f4a22a29dcefdf3/93a893dc9096f5490890254f5d0d3a65.mp4",
+                    "seconds": "312",
+                    "number": "0"
+                }
+            ],
+            "1080p": [
+                {
+                    "url": "http://v1.ergengtech.com/transcode/d205fe25d74d26160f4a22a29dcefdf3/703aec4ee05640ad0900e9ef07167426.mp4",
+                    "seconds": "312",
+                    "number": "0"
+                }
+            ]
+        }
+    }
+}
