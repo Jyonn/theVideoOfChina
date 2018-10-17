@@ -7,6 +7,8 @@ from Base.response import Ret
 
 
 class PearVideo:
+    NAME = '梨视频'
+
     @staticmethod
     def detect(url):
         return url.find('pearvideo.com') > -1

@@ -6,6 +6,8 @@ from Base.response import Ret
 
 
 class ErGeng:
+    NAME = '二更视频'
+
     RESOURCE_API = 'https://member.ergengtv.com/api/video/vod/?id=%s'
 
     @staticmethod

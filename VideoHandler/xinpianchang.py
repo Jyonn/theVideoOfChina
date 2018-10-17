@@ -6,6 +6,8 @@ from Base.response import Ret
 
 
 class XinPianChang:
+    NAME = '新片场'
+
     RESOURCE_API = 'https://openapi-vtom.vmovier.com/v3/video/%s?expand=resource,resource_origin?'
 
     @staticmethod
