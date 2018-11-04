@@ -4,11 +4,13 @@ from Base.response import response, error_response
 from VideoHandler.ergeng import ErGeng
 from VideoHandler.pearvideo import PearVideo
 from VideoHandler.xinpianchang import XinPianChang
+from VideoHandler.ttwz_qq import TTWZ_QQ
 
 websites = [
     XinPianChang,
     ErGeng,
     PearVideo,
+    TTWZ_QQ,
 ]
 
 

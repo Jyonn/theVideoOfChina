@@ -1,5 +1,5 @@
 import zlib
-from urllib import request
+from urllib import request, parse
 
 
 def abstract_grab(url, phone_agent=False):
@@ -32,6 +32,22 @@ def abstract_grab(url, phone_agent=False):
     res.close()
     if gzipped:
         content = zlib.decompress(compressed_data, 16+zlib.MAX_WBITS)  # 解压
+    else:
+        content = compressed_data
+    content = content.decode("utf-8")
+
+    return content
+
+
+def abstract_post(url, data):
+    data = parse.urlencode(data).encode('utf-8')
+    req = request.Request(url, method='POST', data=data)
+    res = request.urlopen(req)
+    gzipped = res.headers.get('Content-Encoding')  # 判断是否压缩
+    compressed_data = res.read()
+    res.close()
+    if gzipped:
+        content = zlib.decompress(compressed_data, 16 + zlib.MAX_WBITS)  # 解压
     else:
         content = compressed_data
     content = content.decode("utf-8")
