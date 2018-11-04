@@ -2,6 +2,7 @@ import json
 from urllib import parse
 
 from Base.grab import abstract_post, abstract_grab
+from Base.response import Ret
 
 
 class TTWZ_QQ:
@@ -53,4 +54,4 @@ class TTWZ_QQ:
         result['more_options'] = list(filter(lambda x: 'url' in x, result['more_options']))
         result['default_url'] = result['more_options'][0]['url']
 
-        return result
+        return Ret(result)
