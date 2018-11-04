@@ -4,9 +4,11 @@ from bs4 import BeautifulSoup
 
 from Base.grab import abstract_grab
 from Base.response import Ret
+from VideoHandler.handler import Handler
 
 
-class PearVideo:
+class PearVideo(Handler):
+    SUPPORT_VERSION = 1
     NAME = '梨视频'
 
     @staticmethod

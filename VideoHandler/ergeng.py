@@ -3,9 +3,11 @@ import re
 
 from Base.grab import abstract_grab
 from Base.response import Ret
+from VideoHandler.handler import Handler
 
 
-class ErGeng:
+class ErGeng(Handler):
+    SUPPORT_VERSION = 1
     NAME = '二更视频'
 
     RESOURCE_API = 'https://member.ergengtv.com/api/video/vod/?id=%s'

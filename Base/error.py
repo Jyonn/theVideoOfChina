@@ -25,6 +25,7 @@ class Error:
     ERROR_VALIDATION_FUNC = E("错误的参数验证函数")
 
     UNRESOLVED_LINK = E("无法解析的链接")
+    EMPTY_HANDLER = E("处理错误")
 
     @classmethod
     def get_error_dict(cls):

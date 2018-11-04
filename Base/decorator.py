@@ -163,7 +163,7 @@ def require_method(method, r_params=None, decode=True):
                     request.DICT = json.loads(request.body.decode())
                 except json.JSONDecodeError as err:
                     deprint(str(err))
-                    request.DICT = {}
+                    request.DICT = request.POST.dict()
             if decode:
                 for k in request.DICT.keys():
                     import binascii

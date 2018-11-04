@@ -3,9 +3,11 @@ import re
 
 from Base.grab import abstract_grab
 from Base.response import Ret
+from VideoHandler.handler import Handler
 
 
-class XinPianChang:
+class XinPianChang(Handler):
+    SUPPORT_VERSION = 1
     NAME = '新片场'
 
     RESOURCE_API = 'https://openapi-vtom.vmovier.com/v3/video/%s?expand=resource,resource_origin?'

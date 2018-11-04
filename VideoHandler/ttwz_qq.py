@@ -3,9 +3,11 @@ from urllib import parse
 
 from Base.grab import abstract_post, abstract_grab
 from Base.response import Ret
+from VideoHandler.handler import Handler
 
 
-class TTWZ_QQ:
+class TTWZ_QQ(Handler):
+    SUPPORT_VERSION = 2
     NAME = '王者荣耀助手视频'
 
     GET_VID_API = 'http://api.kohsocialapp.qq.com:10001/game/detailinfov2'
