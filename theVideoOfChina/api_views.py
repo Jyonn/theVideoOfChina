@@ -7,6 +7,7 @@ from Base.error import Error
 from Base.response import response, error_response
 from VideoHandler.douyin import Douyin, DouyinShort
 from VideoHandler.ergeng import ErGeng
+from VideoHandler.handler import HandlerOutput
 from VideoHandler.pearvideo import PearVideo
 from VideoHandler.xinpianchang import XinPianChang
 from VideoHandler.ttwz_qq import TTWZ_QQ
@@ -44,9 +45,20 @@ def get_dl_link(request):
         web_str += web.NAME + ' '
 
     if v < 2:
-        return error_response(
-            Error.REQUIRE_UPDATE,
-            append_msg='，请用Safari浏览器打开https://s.6-79.cn/zghsp2升级，目前已支持对 %s资源的下载' % web_str,
+        return response(
+            HandlerOutput(
+                only_default=False,
+                more_options=[
+                    HandlerOutput.Option(
+                        url=None,
+                        quality='Safiri打开s.6-79.cn/zghsp2升级',
+                    )
+                ],
+                video_info=HandlerOutput.VideoInfo(
+                    title=None,
+                    cover=None,
+                )
+            ).to_dict()
         )
 
     web_str = ''
