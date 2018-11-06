@@ -26,6 +26,7 @@ class Error:
 
     UNRESOLVED_LINK = E("无法解析的链接")
     ERROR_HANDLER = E("处理错误")
+    REQUIRE_UPDATE = E("中国好视频推出新版本")
 
     @classmethod
     def get_error_dict(cls):

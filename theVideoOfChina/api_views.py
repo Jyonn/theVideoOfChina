@@ -41,6 +41,17 @@ def get_dl_link(request):
     web_str = ''
 
     for web in websites:
+        web_str += web.NAME + ' '
+
+    if v < 2:
+        return error_response(
+            Error.REQUIRE_UPDATE,
+            append_msg='，请用Safari浏览器打开https://s.6-79.cn/zghsp2升级，目前已支持对 %s资源的下载' % web_str,
+        )
+
+    web_str = ''
+
+    for web in websites:
         if v < web.SUPPORT_VERSION:
             continue
         web_str += web.NAME + ' '
