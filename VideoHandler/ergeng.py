@@ -5,7 +5,7 @@ from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_grab
 from Base.response import Ret
-from VideoHandler.handler import Handler
+from VideoHandler.handler import Handler, HandlerOutput
 
 
 class ErGeng(Handler):
@@ -33,23 +33,23 @@ class ErGeng(Handler):
             data = abstract_grab(cls.RESOURCE_API % media_id)
             data = json.loads(data)['msg']['segs']
 
-            result = dict(
-                more_options=[],
-                video_info=dict(
+            result = HandlerOutput(
+                video_info=HandlerOutput.VideoInfo(
                     title=title,
                     cover=cover,
-                )
+                ),
+                only_default=False,
             )
 
             for key in data:
-                result['more_options'].append(dict(
+                result.more_options.append(HandlerOutput.Option(
                     quality=key,
                     url=data[key][0]['url'],
                 ))
 
-            result['default_url'] = result['more_options'][0]['url']
+            result.default_url = result.more_options[0].url
         except Exception as err:
             deprint(str(err))
             return Ret(Error.ERROR_HANDLER)
 
-        return Ret(result)
+        return Ret(result.to_dict())

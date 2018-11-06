@@ -5,7 +5,7 @@ from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_post, abstract_grab
 from Base.response import Ret
-from VideoHandler.handler import Handler
+from VideoHandler.handler import Handler, HandlerOutput
 
 
 class TTWZ_QQ(Handler):
@@ -33,12 +33,12 @@ class TTWZ_QQ(Handler):
             data = json.loads(data)['data']
             vid = data['sVid']
 
-            result = dict(
-                more_options=[],
-                video_info=dict(
+            result = HandlerOutput(
+                video_info=HandlerOutput.VideoInfo(
                     title=data['sTitle'],
                     cover=data['sImageAbbrAddrMiddle'],
-                )
+                ),
+                only_default=False,
             )
 
             data = abstract_grab(cls.VIDEO_INFO_API % vid)
@@ -46,20 +46,20 @@ class TTWZ_QQ(Handler):
 
             fs_dict = dict()
             for item in data['fl']['fi']:
-                o = dict(quality=item['cname'])
-                result['more_options'].append(o)
+                o = HandlerOutput.Option(quality=item['cname'], url=None)
+                result.more_options.append(o)
                 fs_dict[item['fs']] = o
 
             for item in data['vl']['vi']:
                 fn = item['fn']
                 fvkey = item['fvkey']
                 url = item['ul']['ui'][0]['url']
-                fs_dict[item['fs']]['url'] = '%s%s?vkey=%s' % (url, fn, fvkey)
+                fs_dict[item['fs']].url = '%s%s?vkey=%s' % (url, fn, fvkey)
 
-            result['more_options'] = list(filter(lambda x: 'url' in x, result['more_options']))
-            result['default_url'] = result['more_options'][0]['url']
+            result.more_options = list(filter(lambda x: x.url, result.more_options))
+            result.default_url = result.more_options[0].url
         except Exception as err:
             deprint(str(err))
             return Ret(Error.ERROR_HANDLER)
 
-        return Ret(result)
+        return Ret(result.to_dict())

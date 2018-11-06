@@ -6,7 +6,7 @@ from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_grab
 from Base.response import Ret
-from VideoHandler.handler import Handler
+from VideoHandler.handler import Handler, HandlerOutput
 
 
 class PearVideo(Handler):
@@ -32,18 +32,12 @@ class PearVideo(Handler):
             deprint(str(err))
             return Ret(Error.ERROR_HANDLER)
 
-        result = dict(
+        result = HandlerOutput(
             default_url=video_url,
-            more_options=[
-                dict(
-                    quality='default',
-                    url=video_url,
-                )
-            ],
-            video_info=dict(
+            video_info=HandlerOutput.VideoInfo(
                 title=title,
                 cover=cover,
             )
         )
 
-        return Ret(result)
+        return Ret(result.to_dict())
