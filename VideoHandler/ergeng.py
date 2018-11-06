@@ -9,7 +9,6 @@ from VideoHandler.handler import Handler, HandlerOutput
 
 
 class ErGeng(Handler):
-    SUPPORT_VERSION = 1
     NAME = '二更视频'
 
     RESOURCE_API = 'https://member.ergengtv.com/api/video/vod/?id=%s'
@@ -38,16 +37,17 @@ class ErGeng(Handler):
                     title=title,
                     cover=cover,
                 ),
-                only_default=False,
             )
 
-            for key in data:
-                result.more_options.append(HandlerOutput.Option(
-                    quality=key,
-                    url=data[key][0]['url'],
-                ))
+            for quality in data:
+                o = HandlerOutput.Option(urls=[], quality=quality)
+                result.options.append(o)
+                for seg in data[quality]:
+                    o.urls.append(HandlerOutput.Url(
+                        url=seg['url'],
+                        index=seg['number'],
+                    ))
 
-            result.default_url = result.more_options[0].url
         except Exception as err:
             deprint(str(err))
             return Ret(Error.ERROR_HANDLER)

@@ -7,9 +7,8 @@ from Base.response import Ret
 from VideoHandler.handler import Handler, HandlerOutput
 
 
-class DouyinShort(Handler):
-    SUPPORT_VERSION = 1
-    NAME = '抖音短链接'
+class Douyin(Handler):
+    NAME = '抖音'
 
     @staticmethod
     def detect(url):
@@ -32,23 +31,10 @@ class DouyinShort(Handler):
             return Ret(Error.ERROR_HANDLER)
 
         result = HandlerOutput(
-            default_url=video_url,
             video_info=HandlerOutput.VideoInfo(
                 title=title,
                 cover=cover,
-            )
+            ),
+            one_url=video_url,
         )
         return Ret(result.to_dict())
-
-
-class Douyin(Handler):
-    SUPPORT_VERSION = 2
-    NAME = '抖音长链接'
-
-    @staticmethod
-    def detect(url):
-        return url.find('iesdouyin.com') > -1
-
-    @classmethod
-    def handler(cls, url):
-        return DouyinShort.handler(url)

@@ -1,25 +1,23 @@
 from urllib import parse
 
-from django.http import HttpResponseRedirect
 from django.views import View
 
 from Base.decorator import require_get, require_post
 from Base.error import Error
 from Base.response import response, error_response, Ret
-from VideoHandler.douyin import Douyin, DouyinShort
+from VideoHandler.douyin import Douyin
 from VideoHandler.ergeng import ErGeng
-from VideoHandler.handler import HandlerOutput
 from VideoHandler.pearvideo import PearVideo
 from VideoHandler.xinpianchang import XinPianChang
-from VideoHandler.ttwz_qq import TTWZ_QQ
+from VideoHandler.video_qq import ArenaOfValorHelper, WeixinArticle
 
 websites = [
     XinPianChang,
     ErGeng,
     PearVideo,
-    TTWZ_QQ,
+    ArenaOfValorHelper,
     Douyin,
-    DouyinShort,
+    WeixinArticle,
 ]
 
 
@@ -58,22 +56,22 @@ def get_dl_link(request):
     for web in websites:
         web_str += web.NAME + ' '
 
-    if v < 2:
+    if v < 3:
         return Ret(
-            HandlerOutput(
+            dict(
                 only_default=False,
                 more_options=[
-                    HandlerOutput.Option(
+                    dict(
                         url='https://s.6-79.cn/7RcehV',
                         quality='Safiri打开s.6-79.cn/zghsp2升级',
                     )
                 ],
-                video_info=HandlerOutput.VideoInfo(
+                video_info=dict(
                     title=None,
                     cover=None,
                 ),
-                default_url='https://s.6-79.cn/7RcehV',
-            ).to_dict()
+                default_option='https://s.6-79.cn/7RcehV',
+            )
         )
 
     web_str = ''
@@ -104,13 +102,3 @@ class LinkView(View):
         if ret.error is not Error.OK:
             return error_response(ret)
         return response(ret.body)
-
-
-class JumpView(View):
-    @staticmethod
-    @require_get(param_list)
-    def get(request):
-        ret = get_dl_link(request)
-        if ret.error is not Error.OK:
-            return error_response(ret)
-        return HttpResponseRedirect(ret.body['default_url'])

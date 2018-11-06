@@ -10,7 +10,6 @@ from VideoHandler.handler import Handler, HandlerOutput
 
 
 class PearVideo(Handler):
-    SUPPORT_VERSION = 1
     NAME = '梨视频'
 
     @staticmethod
@@ -33,11 +32,11 @@ class PearVideo(Handler):
             return Ret(Error.ERROR_HANDLER)
 
         result = HandlerOutput(
-            default_url=video_url,
             video_info=HandlerOutput.VideoInfo(
                 title=title,
                 cover=cover,
-            )
+            ),
+            one_url=video_url,
         )
 
         return Ret(result.to_dict())

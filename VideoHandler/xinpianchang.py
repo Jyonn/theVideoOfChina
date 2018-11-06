@@ -9,7 +9,6 @@ from VideoHandler.handler import Handler, HandlerOutput
 
 
 class XinPianChang(Handler):
-    SUPPORT_VERSION = 1
     NAME = '新片场'
 
     RESOURCE_API = 'https://openapi-vtom.vmovier.com/v3/video/%s?expand=resource,resource_origin?'
@@ -29,18 +28,16 @@ class XinPianChang(Handler):
             data = json.loads(data)['data']
 
             result = HandlerOutput(
-                default_url=data['resource']['default']['https_url'],
                 video_info=HandlerOutput.VideoInfo(
                     title=data['video']['title'],
                     cover=data['video']['cover'],
                 ),
-                only_default=False,
             )
 
             for item in data['resource']['progressive']:
-                result.more_options.append(HandlerOutput.Option(
+                result.options.append(HandlerOutput.Option(
                     quality=item['profile'],
-                    url=item['https_url'],
+                    urls=[HandlerOutput.Url(item['https_url'])],
                 ))
         except Exception as err:
             deprint(str(err))
