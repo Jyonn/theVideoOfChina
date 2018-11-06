@@ -5,6 +5,7 @@ from django.views import View
 from Base.decorator import require_get, require_post
 from Base.error import Error
 from Base.response import response, error_response
+from VideoHandler.douyin import Douyin, DouyinShort
 from VideoHandler.ergeng import ErGeng
 from VideoHandler.pearvideo import PearVideo
 from VideoHandler.xinpianchang import XinPianChang
@@ -15,6 +16,8 @@ websites = [
     ErGeng,
     PearVideo,
     TTWZ_QQ,
+    Douyin,
+    DouyinShort,
 ]
 
 param_list = [

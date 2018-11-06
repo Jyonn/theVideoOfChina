@@ -1,6 +1,8 @@
 import json
 import re
 
+from Base.common import deprint
+from Base.error import Error
 from Base.grab import abstract_grab
 from Base.response import Ret
 from VideoHandler.handler import Handler
@@ -18,26 +20,30 @@ class XinPianChang(Handler):
 
     @classmethod
     def handler(cls, url):
-        html = abstract_grab(url)
-        vid_regex = 'vid: "(.*?)",'
-        vid = re.search(vid_regex, html, flags=re.S).group(1)
+        try:
+            html = abstract_grab(url)
+            vid_regex = 'vid: "(.*?)",'
+            vid = re.search(vid_regex, html, flags=re.S).group(1)
 
-        data = abstract_grab(cls.RESOURCE_API % vid)
-        data = json.loads(data)['data']
+            data = abstract_grab(cls.RESOURCE_API % vid)
+            data = json.loads(data)['data']
 
-        result = dict(
-            default_url=data['resource']['default']['https_url'],
-            more_options=[],
-            video_info=dict(
-                title=data['video']['title'],
-                cover=data['video']['cover'],
+            result = dict(
+                default_url=data['resource']['default']['https_url'],
+                more_options=[],
+                video_info=dict(
+                    title=data['video']['title'],
+                    cover=data['video']['cover'],
+                )
             )
-        )
 
-        for item in data['resource']['progressive']:
-            result['more_options'].append(dict(
-                quality=item['profile'],
-                url=item['https_url'],
-            ))
+            for item in data['resource']['progressive']:
+                result['more_options'].append(dict(
+                    quality=item['profile'],
+                    url=item['https_url'],
+                ))
+        except Exception as err:
+            deprint(str(err))
+            return Ret(Error.ERROR_HANDLER)
 
         return Ret(result)

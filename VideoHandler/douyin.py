@@ -1,7 +1,5 @@
 import re
 
-from bs4 import BeautifulSoup
-
 from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_grab
@@ -9,25 +7,26 @@ from Base.response import Ret
 from VideoHandler.handler import Handler
 
 
-class PearVideo(Handler):
+class DouyinShort(Handler):
     SUPPORT_VERSION = 1
-    NAME = '梨视频'
+    NAME = '抖音短链接'
 
     @staticmethod
     def detect(url):
-        return url.find('pearvideo.com') > -1
+        return url.find('v.douyin.com') > -1
 
     @classmethod
     def handler(cls, url):
         try:
             html = abstract_grab(url)
-            video_url_regex = 'srcUrl="(.*?)",'
+            title_regex = '<p class="desc">(.*?)</p>'
+            title = re.search(title_regex, html, flags=re.S).group(1)
+
+            video_url_regex = 'playAddr: "(.*?)",'
             video_url = re.search(video_url_regex, html, flags=re.S).group(1)
 
-            soup = BeautifulSoup(html, 'html.parser')
-
-            title = soup.find('h1').get_text()
-            cover = soup.find(id='poster').find('img').get('src')
+            cover_regex = 'cover: "(.*?)"'
+            cover = re.search(cover_regex, html, flags=re.S).group(1)
         except Exception as err:
             deprint(str(err))
             return Ret(Error.ERROR_HANDLER)
@@ -45,5 +44,17 @@ class PearVideo(Handler):
                 cover=cover,
             )
         )
-
         return Ret(result)
+
+
+class Douyin(Handler):
+    SUPPORT_VERSION = 2
+    NAME = '抖音长链接'
+
+    @staticmethod
+    def detect(url):
+        return url.find('iesdouyin.com') > -1
+
+    @classmethod
+    def handler(cls, url):
+        return DouyinShort.handler(url)

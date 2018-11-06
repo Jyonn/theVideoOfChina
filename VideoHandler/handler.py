@@ -12,4 +12,4 @@ class Handler:
 
     @classmethod
     def handler(cls, url):
-        return Ret(Error.EMPTY_HANDLER)
+        return Ret(Error.ERROR_HANDLER)
