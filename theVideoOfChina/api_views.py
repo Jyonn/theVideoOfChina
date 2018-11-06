@@ -1,10 +1,11 @@
 from urllib import parse
 
+from django.http import HttpResponseRedirect
 from django.views import View
 
 from Base.decorator import require_get, require_post
 from Base.error import Error
-from Base.response import response, error_response
+from Base.response import response, error_response, Ret
 from VideoHandler.douyin import Douyin, DouyinShort
 from VideoHandler.ergeng import ErGeng
 from VideoHandler.handler import HandlerOutput
@@ -58,8 +59,8 @@ def get_dl_link(request):
         web_str += web.NAME + ' '
 
     if v < 2:
-        return response(
-            body=HandlerOutput(
+        return Ret(
+            HandlerOutput(
                 only_default=False,
                 more_options=[
                     HandlerOutput.Option(
@@ -82,21 +83,34 @@ def get_dl_link(request):
             continue
         web_str += web.NAME + ' '
         if web.detect(url):
-            ret = web.handler(url)
-            if ret.error is not Error.OK:
-                return error_response(ret)
-            return response(body=ret.body)
+            return web.handler(url)
 
-    return error_response(Error.UNRESOLVED_LINK, append_msg='，目前只支持对 %s资源的下载' % web_str)
+    return Ret(Error.UNRESOLVED_LINK, append_msg='，目前只支持对 %s资源的下载' % web_str)
 
 
 class LinkView(View):
     @staticmethod
     @require_get(param_list)
     def get(request):
-        return get_dl_link(request)
+        ret = get_dl_link(request)
+        if ret.error is not Error.OK:
+            return error_response(ret)
+        return response(ret.body)
 
     @staticmethod
     @require_post(param_list)
     def post(request):
-        return get_dl_link(request)
+        ret = get_dl_link(request)
+        if ret.error is not Error.OK:
+            return error_response(ret)
+        return response(ret.body)
+
+
+class JumpView(View):
+    @staticmethod
+    @require_get(param_list)
+    def get(request):
+        ret = get_dl_link(request)
+        if ret.error is not Error.OK:
+            return error_response(ret)
+        return HttpResponseRedirect(ret.body['default_url'])
