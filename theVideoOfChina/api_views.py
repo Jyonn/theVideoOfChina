@@ -50,14 +50,15 @@ def get_dl_link(request):
                 only_default=False,
                 more_options=[
                     HandlerOutput.Option(
-                        url=None,
+                        url='https://s.6-79.cn/7RcehV',
                         quality='Safiri打开s.6-79.cn/zghsp2升级',
                     )
                 ],
                 video_info=HandlerOutput.VideoInfo(
                     title=None,
                     cover=None,
-                )
+                ),
+                default_url='https://s.6-79.cn/7RcehV',
             ).to_dict()
         )
 
