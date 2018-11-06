@@ -21,10 +21,23 @@ websites = [
     DouyinShort,
 ]
 
+
+def get_url(url):
+    url = parse.unquote(url)
+    import re
+    pattern = re.compile(
+        r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')  # 匹配模式
+
+    urls = re.findall(pattern, url)
+    if urls:
+        return urls[0]
+    raise Exception()
+
+
 param_list = [
     {
         'value': 'url',
-        'process': parse.unquote,
+        'process': get_url,
     },
     {
         'value': 'v',
