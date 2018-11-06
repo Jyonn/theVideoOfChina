@@ -46,7 +46,7 @@ def get_dl_link(request):
 
     if v < 2:
         return response(
-            HandlerOutput(
+            body=HandlerOutput(
                 only_default=False,
                 more_options=[
                     HandlerOutput.Option(
