@@ -9,10 +9,44 @@ from Base.response import Ret
 from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
 
 
-class VideoQQ:
+class VideoQQ(Handler):
+    SUPPORT_VERSION = 3
+    NAME = '腾讯视频'
+
     VIDEO_INFO_API = 'http://h5vv.video.qq.com/getinfo?otype=json&vid=%s&defn=%s'
     SEG_VIDEO_API = \
         'http://h5vv.video.qq.com/getkey?otype=json&vid=%s&format=%s&filename=%s&platform=10901'
+
+    @staticmethod
+    def detect(url):
+        return url.find('v.qq.com') > -1
+
+    @classmethod
+    def handler(cls, url):
+        try:
+            html = abstract_grab(url)
+            vid_link_regex = '<link rel="canonical" href="(.*?).html"'
+            vid_link = re.search(vid_link_regex, html, flags=re.S).group(1)
+
+            video_info_regex = 'var VIDEO_INFO = (.*?)\n</script>'
+            video_info = re.search(video_info_regex, html, flags=re.S).group(1)
+
+            data = json.loads(video_info)
+
+            vid = vid_link[vid_link.rfind('/') + 1:]
+            result = HandlerOutput(
+                video_info=HandlerOutput.VideoInfo(
+                    title=data['title'],
+                    cover=data['pic_640_360'],
+                ),
+                options=VideoQQ.get_video_link(vid),
+            )
+        except Exception as err:
+            deprint(str(err))
+            return Ret(Error.ERROR_HANDLER, append_msg='，具体原因：' + cls.NAME + '，' + str(err))
+
+        return Ret(HandlerAdapter([result]))
+
 
     @classmethod
     def get_video_link(cls, vid):
@@ -125,15 +159,8 @@ class ArenaOfValorHelper(Handler):
                 ),
                 options=VideoQQ.get_video_link(vid),
             )
-
-            result.default_option = result.options[0].url
         except Exception as err:
             deprint(str(err))
             return Ret(Error.ERROR_HANDLER, append_msg='，具体原因：' + cls.NAME + '，' + str(err))
 
         return Ret(HandlerAdapter([result]))
-
-# print(
-# HandlerOutput(
-#     options=VideoQQ.get_video_link('m0028s08v11')
-# ).to_dict())

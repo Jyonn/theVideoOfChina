@@ -11,7 +11,7 @@ from VideoHandler.handler import Handler
 from VideoHandler.meipian import MeiPianArticle
 from VideoHandler.pearvideo import PearVideo
 from VideoHandler.xinpianchang import XinPianChang
-from VideoHandler.video_qq import ArenaOfValorHelper, WeixinArticle
+from VideoHandler.video_qq import ArenaOfValorHelper, WeixinArticle, VideoQQ
 
 websites = [
     XinPianChang,
@@ -22,6 +22,7 @@ websites = [
     DouyinLong,
     WeixinArticle,
     MeiPianArticle,
+    VideoQQ,
 ]
 
 
