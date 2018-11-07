@@ -4,11 +4,11 @@ from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_grab
 from Base.response import Ret
-from VideoHandler.handler import Handler, HandlerOutput
+from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
 
 
-class Douyin(Handler):
-    NAME = '抖音'
+class DouyinShort(Handler):
+    NAME = '抖音短链接'
 
     @staticmethod
     def detect(url):
@@ -28,7 +28,7 @@ class Douyin(Handler):
             cover = re.search(cover_regex, html, flags=re.S).group(1)
         except Exception as err:
             deprint(str(err))
-            return Ret(Error.ERROR_HANDLER)
+            return Ret(Error.ERROR_HANDLER, append_msg='，具体原因：' + cls.NAME + '，' + str(err))
 
         result = HandlerOutput(
             video_info=HandlerOutput.VideoInfo(
@@ -37,4 +37,17 @@ class Douyin(Handler):
             ),
             one_url=video_url,
         )
-        return Ret(result.to_dict())
+        return Ret(HandlerAdapter([result]))
+
+
+class DouyinLong(Handler):
+    NAME = '抖音长链接'
+    SUPPORT_VERSION = 2
+
+    @staticmethod
+    def detect(url):
+        return url.find('iesdouyin.com') > -1
+
+    @classmethod
+    def handler(cls, url):
+        return DouyinShort.handler(url)

@@ -6,12 +6,13 @@ from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_post, abstract_grab
 from Base.response import Ret
-from VideoHandler.handler import Handler, HandlerOutput
+from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
 
 
 class VideoQQ:
     VIDEO_INFO_API = 'http://h5vv.video.qq.com/getinfo?otype=json&vid=%s&defn=%s'
-    SEG_VIDEO_API = 'http://h5vv.video.qq.com/getkey?otype=json&vid=%s&format=%s&filename=%s&platform=10901'
+    SEG_VIDEO_API = \
+        'http://h5vv.video.qq.com/getkey?otype=json&vid=%s&format=%s&filename=%s&platform=10901'
 
     @classmethod
     def get_video_link(cls, vid):
@@ -55,6 +56,7 @@ class VideoQQ:
 
 class WeixinArticle(Handler):
     NAME = '微信公众号文章内置视频'
+    SUPPORT_VERSION = 3
 
     @staticmethod
     def detect(url):
@@ -62,34 +64,37 @@ class WeixinArticle(Handler):
 
     @classmethod
     def handler(cls, url):
-        # try:
-        html = abstract_grab(url)
-        vid_regex = ';vid=(.*?)">'
-        vid = re.search(vid_regex, html, flags=re.S).group(1)
+        try:
+            html = abstract_grab(url)
+            vid_regex = ';vid=(.*?)">'
+            vids = re.findall(vid_regex, html, flags=re.S)
 
-        title_regex = 'msg_title = "(.*?)";'
-        title = re.search(title_regex, html, flags=re.S).group(1)
+            title_regex = 'msg_title = "(.*?)";'
+            title = "《" + re.search(title_regex, html, flags=re.S).group(1) + "》"
 
-        cover_regex = 'msg_cdn_url = "(.*?)";'
-        cover = re.search(cover_regex, html, flags=re.S).group(1)
+            cover_regex = 'msg_cdn_url = "(.*?)";'
+            cover = re.search(cover_regex, html, flags=re.S).group(1)
 
-        result = HandlerOutput(
-            video_info=HandlerOutput.VideoInfo(
-                title=title + ' 文章内视频',
-                cover=cover,
-            ),
-            options=VideoQQ.get_video_link(vid),
-        )
+            results = []
+            for index, vid in enumerate(vids):
+                result = HandlerOutput(
+                    video_info=HandlerOutput.VideoInfo(
+                        title=title + ' 文章内视频%s' % index,
+                        cover=cover,
+                    ),
+                    options=VideoQQ.get_video_link(vid),
+                )
+                results.append(result)
+        except Exception as err:
+            deprint(str(err))
+            return Ret(Error.ERROR_HANDLER, append_msg='，具体原因：' + cls.NAME + '，' + str(err))
 
-        # except Exception as err:
-        #     deprint(str(err))
-        #     return Ret(Error.ERROR_HANDLER)
-
-        return Ret(result.to_dict())
+        return Ret(HandlerAdapter(results))
 
 
 class ArenaOfValorHelper(Handler):
     NAME = '王者荣耀助手视频'
+    SUPPORT_VERSION = 2
 
     GET_VID_API = 'http://api.kohsocialapp.qq.com:10001/game/detailinfov2'
     VIDEO_INFO_API = 'http://h5vv.video.qq.com/getinfo?otype=json&platform=11001&vids=%s'
@@ -105,11 +110,11 @@ class ArenaOfValorHelper(Handler):
         try:
             o = parse.urlparse(url)
             qs = parse.parse_qs(o.query)
-            gameId = qs['gameId'][0]
-            iInfoId = qs['iInfoId'][0]
+            game_id = qs['gameId'][0]
+            i_info_id = qs['iInfoId'][0]
 
             data = abstract_post(cls.GET_VID_API,
-                                 data=dict(iInfoId=iInfoId, gameId=gameId, cSystem=1))
+                                 data=dict(iInfoId=i_info_id, gameId=game_id, cSystem=1))
             data = json.loads(data)['data']
             vid = data['sVid']
 
@@ -124,6 +129,11 @@ class ArenaOfValorHelper(Handler):
             result.default_option = result.options[0].url
         except Exception as err:
             deprint(str(err))
-            return Ret(Error.ERROR_HANDLER)
+            return Ret(Error.ERROR_HANDLER, append_msg='，具体原因：' + cls.NAME + '，' + str(err))
 
-        return Ret(result.to_dict())
+        return Ret(HandlerAdapter([result]))
+
+# print(
+# HandlerOutput(
+#     options=VideoQQ.get_video_link('m0028s08v11')
+# ).to_dict())

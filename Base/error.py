@@ -23,10 +23,12 @@ class Error:
     REQUIRE_BASE64 = E("参数需要base64编码")
     ERROR_PARAM_FORMAT = E("错误的参数格式")
     ERROR_VALIDATION_FUNC = E("错误的参数验证函数")
+    ERROR_PROCESS_FUNC = E("错误的预处理函数")
 
     UNRESOLVED_LINK = E("无法解析的链接")
     ERROR_HANDLER = E("处理错误")
-    REQUIRE_UPDATE = E("中国好视频推出新版本")
+    NEW_VERSION_SUPPORT = E("新版本支持下载此视频")
+    NO_URL = E("找不到URL链接")
 
     @classmethod
     def get_error_dict(cls):

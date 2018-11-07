@@ -5,7 +5,7 @@ from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_grab
 from Base.response import Ret
-from VideoHandler.handler import Handler, HandlerOutput
+from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
 
 
 class XinPianChang(Handler):
@@ -41,6 +41,6 @@ class XinPianChang(Handler):
                 ))
         except Exception as err:
             deprint(str(err))
-            return Ret(Error.ERROR_HANDLER)
+            return Ret(Error.ERROR_HANDLER, append_msg='，具体原因：' + cls.NAME + '，' + str(err))
 
-        return Ret(result.to_dict())
+        return Ret(HandlerAdapter([result]))

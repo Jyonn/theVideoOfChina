@@ -5,8 +5,10 @@ from django.views import View
 from Base.decorator import require_get, require_post
 from Base.error import Error
 from Base.response import response, error_response, Ret
-from VideoHandler.douyin import Douyin
+from VideoHandler.douyin import DouyinShort, DouyinLong
 from VideoHandler.ergeng import ErGeng
+from VideoHandler.handler import Handler
+from VideoHandler.meipian import MeiPianArticle
 from VideoHandler.pearvideo import PearVideo
 from VideoHandler.xinpianchang import XinPianChang
 from VideoHandler.video_qq import ArenaOfValorHelper, WeixinArticle
@@ -16,27 +18,28 @@ websites = [
     ErGeng,
     PearVideo,
     ArenaOfValorHelper,
-    Douyin,
+    DouyinShort,
+    DouyinLong,
     WeixinArticle,
+    MeiPianArticle,
 ]
 
 
 def get_url(url):
-    url = parse.unquote(url)
     import re
     pattern = re.compile(
         r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')  # 匹配模式
 
     urls = re.findall(pattern, url)
     if urls:
-        return urls[0]
-    raise Exception()
+        return Ret(urls[0])
+    return Ret(Error.NO_URL)
 
 
 param_list = [
     {
         'value': 'url',
-        'process': get_url,
+        'process': parse.unquote,
     },
     {
         'value': 'v',
@@ -47,43 +50,57 @@ param_list = [
 ]
 
 
+def check_support(url, v):
+    web_str = ''
+    new_support_str = ''
+
+    for web in websites:
+        if web.detect(url):
+            if v < web.SUPPORT_VERSION:
+                return Ret(Error.NEW_VERSION_SUPPORT)
+            return Ret(web)
+        web_str += web.NAME + ' '
+        if v < web.SUPPORT_VERSION:
+            new_support_str += web.NAME + ' '
+
+    if v < Handler.LATEST_VERSION:
+        append_msg = '，新版本支持对 %s资源的下载' % new_support_str
+    else:
+        append_msg = '，目前支持对 %s资源对下载' % web_str
+
+    return Ret(Error.UNRESOLVED_LINK, append_msg=append_msg)
+
+
+def v1_compat(ret, v):
+    if v > 1:
+        return ret
+    return Ret(dict(
+        more_options=[dict(
+            quality='老版本将于2018年底放弃兼容',
+            url='https://s.6-79.cn/7RcehV'
+        )]
+    ))
+
+
 def get_dl_link(request):
     url = request.d.url
     v = request.d.v
 
-    web_str = ''
+    ret = get_url(url)
+    if ret.error is not Error.OK:
+        return ret
+    url = ret.body
 
-    for web in websites:
-        web_str += web.NAME + ' '
+    ret = check_support(url, v)
+    if ret.error is not Error.OK:
+        return v1_compat(ret, v)
+    web = ret.body
 
-    if v < 3:
-        return Ret(
-            dict(
-                only_default=False,
-                more_options=[
-                    dict(
-                        url='https://s.6-79.cn/7RcehV',
-                        quality='Safiri打开s.6-79.cn/zghsp2升级',
-                    )
-                ],
-                video_info=dict(
-                    title=None,
-                    cover=None,
-                ),
-                default_option='https://s.6-79.cn/7RcehV',
-            )
-        )
-
-    web_str = ''
-
-    for web in websites:
-        if v < web.SUPPORT_VERSION:
-            continue
-        web_str += web.NAME + ' '
-        if web.detect(url):
-            return web.handler(url)
-
-    return Ret(Error.UNRESOLVED_LINK, append_msg='，目前只支持对 %s资源的下载' % web_str)
+    ret = web.handler(url)
+    if ret.error is not Error.OK:
+        return ret
+    results = ret.body
+    return Ret(results.to_dict(v))
 
 
 class LinkView(View):

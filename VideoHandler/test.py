@@ -1,51 +1,64 @@
-import requests
-import json
+import datetime
+import math
 
-vid = 'y00221a60w7' # replace with your vid
-for definition in ('shd', 'hd', 'sd'):
-    params = {
-        'isHLS': False,
-        'charge': 0,
-        'vid': vid,
-        'defn': definition,
-        'defnpayver': 1,
-        'otype': 'json',
-        'platform': 10901,
-        'sdtfrom': 'v1010',
-        'host': 'v.qq.com',
-        'fhdswitch': 0,
-        'show1080p': 1,
-    }
-    r = requests.get('http://h5vv.video.qq.com/getinfo', params=params)
-    data = r.content.decode()[len('QZOutputJson='):-1]
-    data = json.loads(data)
-    # print(data)
-    # continue
+crt_time = datetime.datetime.now()
 
-    url_prefix = data['vl']['vi'][0]['ul']['ui'][0]['url']
-    for stream in data['fl']['fi']:
-        if stream['name'] != definition:
-            continue
-        stream_id = stream['id']
-        urls = []
-        for d in data['vl']['vi'][0]['cl']['ci']:
-            keyid = d['keyid']
-            filename = keyid.replace('.10', '.p', 1) + '.mp4'
-            params = {
-                'otype': 'json',
-                'vid': vid,
-                'format': stream_id,
-                'filename': filename,
-                'platform': 10901,
-                'vt': 217,
-                'charge': 0,
-            }
-            r = requests.get('http://h5vv.video.qq.com/getkey', params=params)
-            data = r.content.decode()[len('QZOutputJson='):-1]
-            data = json.loads(data)
-            url = '%s/%s?sdtfrom=v1010&vkey=%s' % (url_prefix, filename, data['key'])
-            urls.append(url)
+int_time = int(crt_time.timestamp() * 1000)
 
-        print('stream:', stream['name'])
-        for url in urls:
-            print(url)
+week_day = crt_time.date().weekday() + 1
+
+o = '7.' + str(week_day)
+a = str(int_time)[0:10]
+e = '70201'
+t = 'm0028s08v11'  # vid
+r = 'v1104'
+n = 1
+
+s_array = ['', '06fc1464', '4244ce1b', '77de31c5', 'e0149fa2', '60394ced', '2da639f0', 'c2f0cf9f']
+s = s_array[week_day]
+
+ha_input = s + t + a + "*#06#" + e
+
+print(ha_input)
+
+
+def ha_i(ha_i_e, ha_i_t):
+    return ((ha_i_e >> 1) + (ha_i_t >> 1) << 1) + (1 & ha_i_e) + (1 & ha_i_t)
+
+
+ha_t = [
+        -680876936, -389564586, 606105819, -1044525330,
+        -176418897, 1200080426, -1473231341, -45705983,
+        1770035416, -1958414417, -42063, -1990404162,
+        1804603682, -40341101, -1502002290, 1236535329,
+        -165796510, -1069501632, 643717713, -373897302,
+        -701558691, 38016083, -660478335, -405537848,
+        568446438, -1019803690, -187363961, 1163531501,
+        -1444681467, -51403784, 1735328473, -1926607734,
+        -378558, -2022574463, 1839030562, -35309556,
+        -1530992060, 1272893353, -155497632, -1094730640,
+        681279174, -358537222, -722521979, 76029189,
+        -640364487, -421815835, 530742520, -995338651,
+        -198630844, 1126891415, -1416354905, -57434055,
+        1700485571, -1894986606, -1051523, -2054922799,
+        1873313359, -30611744, -1560198380, 1309151649,
+        -145523070, -1120210379, 718787259, -343485551
+    ]
+
+
+def ha(ha_e):
+    ha_s = []
+    ha_d = ha_e
+    ha_l = len(ha_d)
+    ha_u = [1732584193, -271733879, -1732584194, 271733878]
+    ha_c = 0
+    while ha_c <= ha_l:
+        res = ord(ha_d[ha_c]) | 128
+        res = res << (ha_c % 32)
+
+
+
+
+
+
+ha()

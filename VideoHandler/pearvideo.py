@@ -6,7 +6,7 @@ from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_grab
 from Base.response import Ret
-from VideoHandler.handler import Handler, HandlerOutput
+from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
 
 
 class PearVideo(Handler):
@@ -29,7 +29,7 @@ class PearVideo(Handler):
             cover = soup.find(id='poster').find('img').get('src')
         except Exception as err:
             deprint(str(err))
-            return Ret(Error.ERROR_HANDLER)
+            return Ret(Error.ERROR_HANDLER, append_msg='，具体原因：' + cls.NAME + '，' + str(err))
 
         result = HandlerOutput(
             video_info=HandlerOutput.VideoInfo(
@@ -39,4 +39,4 @@ class PearVideo(Handler):
             one_url=video_url,
         )
 
-        return Ret(result.to_dict())
+        return Ret(HandlerAdapter([result]))
