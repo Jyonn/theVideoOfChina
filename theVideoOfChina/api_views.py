@@ -7,6 +7,7 @@ from Base.error import Error
 from Base.response import response, error_response, Ret
 from VideoHandler.douyin import DouyinShort, DouyinLong
 from VideoHandler.ergeng import ErGeng
+from VideoHandler.eyepetizer import EyePetizer
 from VideoHandler.handler import Handler
 from VideoHandler.meipian import MeiPianArticle
 from VideoHandler.pearvideo import PearVideo
@@ -23,6 +24,7 @@ websites = [
     WeixinArticle,
     MeiPianArticle,
     VideoQQ,
+    EyePetizer,
 ]
 
 
