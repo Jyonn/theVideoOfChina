@@ -3,6 +3,7 @@ from Base.response import Ret
 
 
 class Handler:
+    DETAILED_DATE = '181112'
     SUPPORT_VERSION = 1
     LATEST_VERSION = 3
 

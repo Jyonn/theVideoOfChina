@@ -39,9 +39,10 @@ def abstract_grab(url, phone_agent=False):
     return content
 
 
-def abstract_post(url, data):
-    data = parse.urlencode(data).encode('utf-8')
-    req = request.Request(url, method='POST', data=data)
+def abstract_post(url, data, headers=None, raw_data=False):
+    if not raw_data:
+        data = parse.urlencode(data).encode('utf-8')
+    req = request.Request(url, method='POST', data=data, headers=headers or {})
     res = request.urlopen(req)
     gzipped = res.headers.get('Content-Encoding')  # 判断是否压缩
     compressed_data = res.read()

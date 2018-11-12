@@ -18,8 +18,6 @@ class EyePetizer(Handler):
     def detect(url):
         o = parse.urlparse(url)
         qs = parse.parse_qs(o.query)
-        print(qs)
-        print(o.netloc)
         return 'eyepetizer.net' in o.netloc and 'vid' in qs
 
     @classmethod

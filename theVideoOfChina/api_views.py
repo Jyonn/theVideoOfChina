@@ -10,6 +10,7 @@ from VideoHandler.ergeng import ErGeng
 from VideoHandler.eyepetizer import EyePetizer
 from VideoHandler.handler import Handler
 from VideoHandler.meipian import MeiPianArticle
+from VideoHandler.netease import NetEase
 from VideoHandler.pearvideo import PearVideo
 from VideoHandler.xinpianchang import XinPianChang
 from VideoHandler.video_qq import ArenaOfValorHelper, WeixinArticle, VideoQQ
@@ -23,15 +24,16 @@ websites = [
     DouyinLong,
     WeixinArticle,
     MeiPianArticle,
-    VideoQQ,
+    # VideoQQ,
     EyePetizer,
+    NetEase,
 ]
 
 
 def get_url(url):
     import re
     pattern = re.compile(
-        r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')  # 匹配模式
+        r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!#*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')  # 匹配模式
 
     urls = re.findall(pattern, url)
     if urls:
