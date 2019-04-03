@@ -1,10 +1,9 @@
 from urllib import parse
 
+from SmartDjango import Packing, Param
 from django.views import View
 
-from Base.decorator import require_get, require_post
 from Base.error import Error
-from Base.response import response, error_response, Ret
 from VideoHandler.douyin import DouyinShort, DouyinLong
 from VideoHandler.ergeng import ErGeng
 from VideoHandler.eyepetizer import EyePetizer
@@ -30,6 +29,7 @@ websites = [
 ]
 
 
+@Packing.pack
 def get_url(url):
     import re
     pattern = re.compile(
@@ -37,24 +37,17 @@ def get_url(url):
 
     urls = re.findall(pattern, url)
     if urls:
-        return Ret(urls[0])
-    return Ret(Error.NO_URL)
+        return urls[0]
+    return Error.NO_URL
 
 
 param_list = [
-    {
-        'value': 'url',
-        'process': parse.unquote,
-    },
-    {
-        'value': 'v',
-        'default': True,
-        'default_value': 1,
-        'process': int,
-    }
+    Param('url').process(parse.unquote),
+    Param('v').dft(1).process(int),
 ]
 
 
+@Packing.pack
 def check_support(url, v):
     web_str = ''
     new_support_str = ''
@@ -62,8 +55,8 @@ def check_support(url, v):
     for web in websites:
         if web.detect(url):
             if v < web.SUPPORT_VERSION:
-                return Ret(Error.NEW_VERSION_SUPPORT)
-            return Ret(web)
+                return Error.NEW_VERSION_SUPPORT
+            return web
         web_str += web.NAME + ' '
         if v < web.SUPPORT_VERSION:
             new_support_str += web.NAME + ' '
@@ -73,54 +66,58 @@ def check_support(url, v):
     else:
         append_msg = '，目前支持对 %s资源对下载' % web_str
 
-    return Ret(Error.UNRESOLVED_LINK, append_msg=append_msg)
+    return Error.UNRESOLVED_LINK(append_msg)
 
 
+@Packing.pack
 def v1_compat(ret, v):
     if v > 1:
         return ret
-    return Ret(dict(
+    return dict(
         more_options=[dict(
             quality='老版本将于2018年底放弃兼容',
             url='https://s.6-79.cn/7RcehV'
         )]
-    ))
+    )
 
 
+@Packing.pack
 def get_dl_link(request):
     url = request.d.url
     v = request.d.v
 
     ret = get_url(url)
-    if ret.error is not Error.OK:
+    if not ret.ok:
         return ret
     url = ret.body
 
     ret = check_support(url, v)
-    if ret.error is not Error.OK:
+    if not ret.ok:
         return v1_compat(ret, v)
     web = ret.body
 
     ret = web.handler(url)
-    if ret.error is not Error.OK:
+    if not ret.ok:
         return ret
     results = ret.body
-    return Ret(results.to_dict(v))
+    return results.to_dict(v)
 
 
 class LinkView(View):
     @staticmethod
-    @require_get(param_list)
+    @Packing.http_pack
+    @Param.require(q=param_list)
     def get(request):
         ret = get_dl_link(request)
-        if ret.error is not Error.OK:
-            return error_response(ret)
-        return response(ret.body)
+        if not ret.ok:
+            return ret
+        return ret.body
 
     @staticmethod
-    @require_post(param_list)
+    @Packing.http_pack
+    @Param.require(b=param_list)
     def post(request):
         ret = get_dl_link(request)
-        if ret.error is not Error.OK:
-            return error_response(ret)
-        return response(ret.body)
+        if not ret.ok:
+            return ret
+        return ret.body

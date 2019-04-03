@@ -2,10 +2,11 @@ import json
 import re
 from urllib import parse
 
+from SmartDjango import Packing
+
 from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_post, abstract_grab
-from Base.response import Ret
 from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
 
 
@@ -22,6 +23,7 @@ class VideoQQ(Handler):
         return url.find('v.qq.com') > -1
 
     @classmethod
+    @Packing.pack
     def handler(cls, url):
         try:
             html = abstract_grab(url)
@@ -43,10 +45,9 @@ class VideoQQ(Handler):
             )
         except Exception as err:
             deprint(str(err))
-            return Ret(Error.ERROR_HANDLER, append_msg='，具体原因：' + cls.NAME + '，' + str(err))
+            return Error.ERROR_HANDLER('具体原因：' + cls.NAME + '，' + str(err))
 
-        return Ret(HandlerAdapter([result]))
-
+        return HandlerAdapter([result])
 
     @classmethod
     def get_video_link(cls, vid):
@@ -56,6 +57,7 @@ class VideoQQ(Handler):
         for defn in definitions:
             data = abstract_grab(cls.VIDEO_INFO_API % (vid, defn))
             data = json.loads(data[data.index('=') + 1:-1])
+            # print(data)
 
             qualities = dict()
             for item in data['fl']['fi']:
@@ -97,6 +99,7 @@ class WeixinArticle(Handler):
         return url.find('mp.weixin.qq.com/s/') > -1
 
     @classmethod
+    @Packing.pack
     def handler(cls, url):
         try:
             html = abstract_grab(url)
@@ -121,9 +124,9 @@ class WeixinArticle(Handler):
                 results.append(result)
         except Exception as err:
             deprint(str(err))
-            return Ret(Error.ERROR_HANDLER, append_msg='，具体原因：' + cls.NAME + '，' + str(err))
+            return Error.ERROR_HANDLER('具体原因：' + cls.NAME + '，' + str(err))
 
-        return Ret(HandlerAdapter(results))
+        return HandlerAdapter(results)
 
 
 class ArenaOfValorHelper(Handler):
@@ -140,6 +143,7 @@ class ArenaOfValorHelper(Handler):
         return o.netloc == 'image.ttwz.qq.com' and 'gameId' in qs and 'iInfoId' in qs
 
     @classmethod
+    @Packing.pack
     def handler(cls, url):
         try:
             o = parse.urlparse(url)
@@ -161,6 +165,9 @@ class ArenaOfValorHelper(Handler):
             )
         except Exception as err:
             deprint(str(err))
-            return Ret(Error.ERROR_HANDLER, append_msg='，具体原因：' + cls.NAME + '，' + str(err))
+            return Error.ERROR_HANDLER('具体原因：' + cls.NAME + '，' + str(err))
 
-        return Ret(HandlerAdapter([result]))
+        return HandlerAdapter([result])
+
+
+# print(ArenaOfValorHelper.handler('http://image.ttwz.qq.com/h5/web/share.html?iInfoId=18430206&gameId=20001').body.to_dict(v=3))

@@ -1,11 +1,11 @@
 import re
 
+from SmartDjango import Packing
 from bs4 import BeautifulSoup
 
 from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_grab
-from Base.response import Ret
 from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
 
 
@@ -17,6 +17,7 @@ class PearVideo(Handler):
         return url.find('pearvideo.com') > -1
 
     @classmethod
+    @Packing.pack
     def handler(cls, url):
         try:
             html = abstract_grab(url)
@@ -29,7 +30,7 @@ class PearVideo(Handler):
             cover = soup.find(id='poster').find('img').get('src')
         except Exception as err:
             deprint(str(err))
-            return Ret(Error.ERROR_HANDLER, append_msg='，具体原因：' + cls.NAME + '，' + str(err))
+            return Error.ERROR_HANDLER('具体原因：' + cls.NAME + '，' + str(err))
 
         result = HandlerOutput(
             video_info=HandlerOutput.VideoInfo(
@@ -39,4 +40,4 @@ class PearVideo(Handler):
             one_url=video_url,
         )
 
-        return Ret(HandlerAdapter([result]))
+        return HandlerAdapter([result])

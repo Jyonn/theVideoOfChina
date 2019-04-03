@@ -1,5 +1,6 @@
+from SmartDjango import Packing
+
 from Base.error import Error
-from Base.response import Ret
 
 
 class Handler:
@@ -14,8 +15,9 @@ class Handler:
         return False
 
     @classmethod
+    @Packing.pack
     def handler(cls, url):
-        return Ret(Error.ERROR_HANDLER)
+        return Error.ERROR_HANDLER
 
 
 class HandlerOutput:
