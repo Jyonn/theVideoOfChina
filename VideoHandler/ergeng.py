@@ -1,9 +1,6 @@
 import json
 import re
 
-from SmartDjango import Packing
-
-from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_grab
 from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
@@ -19,7 +16,6 @@ class ErGeng(Handler):
         return url.find('ergengtv.com') > -1
 
     @classmethod
-    @Packing.pack
     def handler(cls, url):
         try:
             html = abstract_grab(url)
@@ -51,7 +47,6 @@ class ErGeng(Handler):
                     ))
 
         except Exception as err:
-            deprint(str(err))
-            return Error.ERROR_HANDLER('，具体原因：' + cls.NAME + '，' + str(err))
+            raise Error.ERROR_HANDLER(debug_message=cls.NAME + '，' + str(err))
 
         return HandlerAdapter([result])

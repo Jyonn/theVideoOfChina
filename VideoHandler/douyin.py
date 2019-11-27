@@ -1,8 +1,5 @@
 import re
 
-from SmartDjango import Packing
-
-from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_grab
 from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
@@ -16,7 +13,6 @@ class DouyinShort(Handler):
         return url.find('v.douyin.com') > -1
 
     @classmethod
-    @Packing.pack
     def handler(cls, url):
         try:
             html = abstract_grab(url)
@@ -29,8 +25,7 @@ class DouyinShort(Handler):
             cover_regex = 'cover: "(.*?)"'
             cover = re.search(cover_regex, html, flags=re.S).group(1)
         except Exception as err:
-            deprint(str(err))
-            return Error.ERROR_HANDLER('具体原因：' + cls.NAME + '，' + str(err))
+            raise Error.ERROR_HANDLER(debug_message=cls.NAME + '，' + str(err))
 
         result = HandlerOutput(
             video_info=HandlerOutput.VideoInfo(
@@ -51,6 +46,5 @@ class DouyinLong(Handler):
         return url.find('iesdouyin.com') > -1
 
     @classmethod
-    @Packing.pack
     def handler(cls, url):
         return DouyinShort.handler(url)

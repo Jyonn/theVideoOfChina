@@ -1,10 +1,8 @@
-from SmartDjango import Packing
-
 from Base.error import Error
 
 
 class Handler:
-    DETAILED_DATE = '181112'
+    DETAILED_DATE = '190404'
     SUPPORT_VERSION = 1
     LATEST_VERSION = 3
 
@@ -15,9 +13,8 @@ class Handler:
         return False
 
     @classmethod
-    @Packing.pack
     def handler(cls, url):
-        return Error.ERROR_HANDLER
+        raise Error.ERROR_HANDLER
 
 
 class HandlerOutput:
@@ -33,8 +30,8 @@ class HandlerOutput:
             )
 
     class Option:
-        def __init__(self, urls=list(), quality='默认'):
-            self.urls = urls
+        def __init__(self, urls=None, quality='默认'):
+            self.urls = urls or []
             self.quality = quality
 
         def to_dict(self, v):
@@ -64,7 +61,8 @@ class HandlerOutput:
                 cover=self.cover,
             )
 
-    def __init__(self, options=list(), video_info=VideoInfo(), one_option=None, one_url=None):
+    def __init__(self, options=None, video_info=VideoInfo(), one_option=None, one_url=None):
+        options = options or []
         if one_url:
             one_option = self.Option(urls=[self.Url(url=one_url)])
         if one_option:
@@ -94,7 +92,7 @@ class HandlerOutput:
 class HandlerAdapter:
     """
     多版本兼容输出类
-    v1: GET {default_url, more_options=[{url, quality}], video_info={title, cover}}
+    *abundant v1: GET {default_url, more_options=[{url, quality}], video_info={title, cover}}
         扩充视频库 二更视频 梨视频 新片场 抖音短分享链接
 
     v2: 兼容POST 提取URL json格式不变
@@ -103,7 +101,9 @@ class HandlerAdapter:
     v3: 多视频爬取，视频分段 [{options=[{urls=[{url, index}], quality}], video_info={title, cover}}]
         扩充视频库 微信公众号文章内置视频 美篇文章内置视频
     """
-    def __init__(self, results=list()):
+    def __init__(self, results=None):
+        if not results:
+            results = []
         self.results = results
 
     def to_dict(self, v):

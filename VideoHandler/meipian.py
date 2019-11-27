@@ -1,8 +1,5 @@
 import re
 
-from SmartDjango import Packing
-
-from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_grab
 from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
@@ -17,7 +14,6 @@ class MeiPianArticle(Handler):
         return url.find('meipian.cn') > -1
 
     @classmethod
-    @Packing.pack
     def handler(cls, url):
         try:
             html = abstract_grab(url)
@@ -26,8 +22,7 @@ class MeiPianArticle(Handler):
             title_regex = 'name="keywords" content="(.*?)"'
             title = "《" + re.search(title_regex, html, flags=re.S).group(1) + "》"
         except Exception as err:
-            deprint(str(err))
-            return Error.ERROR_HANDLER('具体原因：' + cls.NAME + '，' + str(err))
+            raise Error.ERROR_HANDLER(debug_message=cls.NAME + '，' + str(err))
 
         results = []
         for index, video in enumerate(videos):

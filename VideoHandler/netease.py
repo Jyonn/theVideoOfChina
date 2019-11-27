@@ -5,10 +5,8 @@ from urllib import parse
 
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
-from SmartDjango import Packing
 from django.utils.crypto import get_random_string
 
-from Base.common import deprint
 from Base.error import Error
 from Base.grab import abstract_post
 from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
@@ -89,7 +87,6 @@ class NetEase(Handler):
         return url.find('music.163.com') > -1 and url.find('video') > -1
 
     @classmethod
-    @Packing.pack
     def handler(cls, url):
         try:
             url = url.replace('#/', '')
@@ -124,7 +121,6 @@ class NetEase(Handler):
                     quality=data['urls'][0]['r'],
                 ))
         except Exception as err:
-            deprint(str(err))
-            return Error.ERROR_HANDLER('具体原因：' + cls.NAME + '，' + str(err))
+            raise Error.ERROR_HANDLER(debug_message=cls.NAME + '，' + str(err))
 
         return HandlerAdapter([result])
