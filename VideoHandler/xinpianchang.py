@@ -9,7 +9,7 @@ from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
 class XinPianChang(Handler):
     NAME = '新片场'
 
-    RESOURCE_API = 'https://openapi-vtom.vmovier.com/v3/video/%s?expand=resource,resource_origin?'
+    RESOURCE_API = 'https://openapi-vtom.vmovier.com/v3/video/%s?expand=resource&usage=xpc_web&appKey=%s'
 
     @staticmethod
     def detect(url):
@@ -19,10 +19,12 @@ class XinPianChang(Handler):
     def handler(cls, url):
         try:
             html = abstract_grab(url)
-            vid_regex = 'vid: "(.*?)",'
+            vid_regex = 'var vid = "(.*?)";'
             vid = re.search(vid_regex, html, flags=re.S).group(1)
+            app_key_regex = 'var modeServerAppKey = "(.*?)";'
+            app_key = re.search(app_key_regex, html, flags=re.S).group(1)
 
-            data = abstract_grab(cls.RESOURCE_API % vid)
+            data = abstract_grab(cls.RESOURCE_API % (vid, app_key))
             data = json.loads(data)['data']
 
             result = HandlerOutput(
