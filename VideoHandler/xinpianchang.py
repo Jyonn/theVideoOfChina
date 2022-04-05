@@ -9,7 +9,8 @@ from VideoHandler.handler import Handler, HandlerOutput, HandlerAdapter
 class XinPianChang(Handler):
     NAME = '新片场'
 
-    RESOURCE_API = 'https://openapi-vtom.vmovier.com/v3/video/%s?expand=resource&usage=xpc_web&appKey=%s'
+    # RESOURCE_API = 'https://openapi-vtom.vmovier.com/v3/video/%s?expand=resource&usage=xpc_web&appKey=%s'
+    RESOURCE_API = 'https://mod-api.xinpianchang.com/mod/api/v2/media/%s?appKey=%s'
 
     @staticmethod
     def detect(url):
@@ -29,8 +30,8 @@ class XinPianChang(Handler):
 
             result = HandlerOutput(
                 video_info=HandlerOutput.VideoInfo(
-                    title=data['video']['title'],
-                    cover=data['video']['cover'],
+                    title=data['title'],
+                    cover=data['cover'],
                 ),
             )
 
