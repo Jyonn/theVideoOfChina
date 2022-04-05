@@ -38,7 +38,7 @@ class XinPianChang(Handler):
             for item in data['resource']['progressive']:
                 result.options.append(HandlerOutput.Option(
                     quality=item['profile'],
-                    urls=[HandlerOutput.Url(item['https_url'])],
+                    urls=[HandlerOutput.Url(item['url'])],
                 ))
         except Exception as err:
             raise Error.ERROR_HANDLER(debug_message=cls.NAME + '，' + str(err))
